@@ -15,7 +15,7 @@ const audit = require('./routes/auditRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3500;
-const HOST = process.env.HOST;
+// const HOST = process.env.HOST;
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
@@ -30,6 +30,7 @@ const conn = mongoose
 
 //API Route
 app.use("/api", public, user, ordinance, email, uploads, minutes, audit);
-app.listen(PORT, HOST, () => console.log(`Server running on http://${HOST}:${PORT}`));
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+// app.listen(PORT, HOST, () => console.log(`Server running on http://${HOST}:${PORT}`));
 
 module.exports = conn;
