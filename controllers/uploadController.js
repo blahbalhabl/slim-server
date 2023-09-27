@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Ordinance = require('../models/ordinancesModel');
-const Barangay = require('../models/brgyOrdMOdel');
+const Barangay = require('../models/brgyOrdModel');
 
 const draftOrdinance = async (req, res) => {
   try {
