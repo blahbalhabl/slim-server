@@ -17,7 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 3500;
 const HOST = process.env.HOST;
 
-app.use(cors({ origin: 'https://slim-f22i.onrender.com', credentials: true }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.json());
