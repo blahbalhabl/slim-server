@@ -28,6 +28,11 @@ const conn = mongoose
   .then(() => console.log("Connected to DB"))
   .catch((err) => console.log(err));
 
+
+app.use(express.static(path.join(__dirname, 'dist')));
+app.get('/*', function (req, res) {
+   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+ });
 //API Route
 app.use("/api", public, user, ordinance, email, uploads, minutes, audit);
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
