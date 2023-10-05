@@ -287,6 +287,27 @@ const getUser = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  try {
+    const { id, inputs } = req.body;
+    const updateData = Object.entries(inputs).reduce((acc, [key, value]) => {
+      if (value !== "") {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+
+    const user = await UserModel.findOneAndUpdate({ _id: id }, { $set: updateData }, { new: true });
+
+    if (!user) {
+      return res.status(400).json({ message: "User Not Found" });
+    }
+    return res.status(200).json({ message: `Successfully updated user` });
+  } catch (err) {
+    return res.status(500).json({ err, message: "Internal Server Error!" });
+  }
+};
+
 const logoutUser = async (req, res) => {
 
   const refresh = req.cookies.refresh;
@@ -337,7 +358,7 @@ const changePassword = async (req, res) => {
   } catch (err) {
     return res.status(500).json({err, message: 'Internal Server Error'});
   }
-}
+};
 
 // const forgotPassword = async (req, res) => {
 //   const userId = req.id;
@@ -376,6 +397,7 @@ module.exports = {
   createUser,
   loginUser,
   verifyOTP,
+  updateUser,
   useOtp,
   refreshAccessToken,
   logoutUser,

@@ -11,6 +11,7 @@ const {
   changePassword,
   forgotPassword,
   useOtp,
+  updateUser,
 } = require("../controllers/userController");
 const { 
   avatarUpload, 
@@ -37,6 +38,7 @@ router.get("/users", getUsers);
 router.get("/user", getUser);
 router.get('/avatars', getAvatars);
 router.put('/update-2fa', useOtp);
+router.put('/update-user', updateUser);
 router.post("/signup", createUser);
 router.post('/change-password', changePassword);
 router.post('/avatar-upload', image.single('avatar'), avatarUpload);
