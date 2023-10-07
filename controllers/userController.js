@@ -297,7 +297,11 @@ const updateUser = async (req, res) => {
       return acc;
     }, {});
 
-    const user = await UserModel.findOneAndUpdate({ _id: id }, { $set: updateData }, { new: true });
+    const user = await UserModel.findOneAndUpdate(
+      { _id: id }, 
+      { $set: updateData }, 
+      { new: true }
+    );
 
     if (!user) {
       return res.status(400).json({ message: "User Not Found" });
