@@ -8,6 +8,6 @@ const router = Router();
 router.use(verify);
 
 router.post('/send-email', sendEmail);
-router.post('/send-forgot-password', forgotEmail);
+// router.post('/send-forgot-password', forgotEmail);
 
-module.exports = router ;
+module.exports = router;
