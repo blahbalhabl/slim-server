@@ -72,11 +72,6 @@ const generateDefaultPassword = (email) => {
   return `${emailPrefix}${randomDigits}`;
 };
 
-const forgotPassword = (req, res) => {
-  const randomDigits = Math.floor(1000 + Math.random() * 9000).toString();
-  return res.status(200).json({auth: randomDigits});
-}
-
 const createUser = async (req, res) => {
   try {
     const avatar = null;
@@ -319,7 +314,7 @@ const logoutUser = async (req, res) => {
 
   const foundUser = await UserModel.findOne({ refresh }).exec();
   if( !foundUser ) {
-    res.clearCookie('refresh', {httpOnly: true, sameSite: "lax"})
+    res.clearCookie('refresh', {path: '/api', httpOnly: true, sameSite: "lax"})
     return res.status(200).json({msg: "No refresh Token Found"});
   }
 
@@ -364,36 +359,50 @@ const changePassword = async (req, res) => {
   }
 };
 
-// const forgotPassword = async (req, res) => {
-//   const userId = req.id;
-//   const { newpass, confirm } = req.body;
+const checkUser = async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ email: req.params.email });
 
-//   try {
-//     const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(400).json({ message: "User does not exist!" });
+    }
 
-//     if(!user) {
-//       return res.status(400).json({message: 'User does not exist!'});
-//     }
+    const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+    return res.status(200).json({ otp: otpCode,  message: "User Found!" });
+  } catch (err) {
+    return res.status(500).json({err, message: 'Internal Server Error'});
+  }
+};
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email, password, confirmPassword } = req.body;
+    const user = await UserModel.findOne({ email: email });
+
+    if(!user) {
+      return res.status(400).json({message: 'User does not exist!'});
+    };
+
+    const passMatch = await bcrypt.compare(password, user.password);
+
+    if (passMatch) {
+      return res.status(400).json({message: 'New Password cannot be the same as Old Password!'});
+    };
   
-//     await UserModel.findByIdAndUpdate( userId,
-//       { $set: {password: hash }},
-//       { new: true })
-
-//     if(newpass === confirm) {
-//       const hash = await bcrypt.hash(newpass, 10);
-//       await UserModel.findByIdAndUpdate( userId,
-//         { $set: {password: hash }},
-//         { new: true }
-//       )
-
-//     const randomDigits = Math.floor(1000 + Math.random() * 9000).toString();
+    if(password === confirmPassword) {
+      const hash = await bcrypt.hash(password, 10);
+      await UserModel.findOneAndUpdate({email: email},
+        { $set: {password: hash }},
+        { new: true }
+      )
   
-//       return res.status(200).json({auth: randomDigits, message: 'Password Changed!'});
-//     }
-//   } catch (err) {
-//     return res.status(500).json({err, message: 'Internal Server Error'});
-//   }
-// }
+      return res.status(200).json({ message: 'Password Changed!'});
+    }
+  } catch (err) {
+    return res.status(500).json({err, message: 'Internal Server Error'});
+  }
+};
 
 module.exports = {
   getUsers,
@@ -407,4 +416,5 @@ module.exports = {
   logoutUser,
   changePassword,
   forgotPassword,
+  checkUser,
 };

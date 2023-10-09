@@ -27,7 +27,7 @@ const sendEmail = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `ACCOUNT CREATION <${process.env.G_MAIL}>`,
+      from: `SLIM <${process.env.G_MAIL}>`,
       to: email,
       subject: subject,
       html: html,

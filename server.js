@@ -13,6 +13,7 @@ const minutes = require('./routes/minutesRoutes');
 const public = require('./routes/publicRoutes');
 const audit = require('./routes/auditRoutes');
 const members = require('./routes/memberRoutes');
+const forgot = require('./routes/forgotEmailRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3500;
@@ -31,7 +32,8 @@ const conn = mongoose
 
 //API Route
 app.use("/api", 
-  public, 
+  public,
+  forgot,
   user, 
   ordinance, 
   email, 

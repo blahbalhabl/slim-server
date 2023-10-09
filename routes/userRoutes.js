@@ -12,6 +12,7 @@ const {
   forgotPassword,
   useOtp,
   updateUser,
+  checkUser,
 } = require("../controllers/userController");
 const { 
   avatarUpload, 
@@ -24,6 +25,7 @@ const router = Router();
 
 // General Routes
 router.get('/forgot-password', forgotPassword);
+router.post('/forgot-password/:email', checkUser);
 router.post("/login", loginUser);
 router.post("/verify", verifyOTP);
 router.post("/refresh", refreshAccessToken);
