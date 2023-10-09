@@ -105,7 +105,7 @@ const delOrdinance = async (req, res) => {
     const fileName = req.params.fileName;
 
     // Delete the file from the server
-    const filePath = `../server/uploads/files/${type}/${level}/${series}/${fileName}`;
+    const filePath = `../slim-server/uploads/files/${type}/${level}/${series}/${fileName}`;
     await fs.promises.unlink(filePath);
 
     let model;
@@ -162,7 +162,7 @@ const updateOrdinance = async (req, res) => {
 
     if(req.file) {
       // Delete the file from the server
-      const filePath = `../server/uploads/files/${type}/${level}/${series}/${fileName}`;
+      const filePath = `../slim-server/uploads/files/${type}/${level}/${series}/${fileName}`;
       fs.unlinkSync(filePath);
     }
 
@@ -204,7 +204,7 @@ const downloadOrdinance = (req, res) => {
   try {
     const { level, series, type } = req.query;
     const fileName = req.params.fileName;
-    const filePath = `../server/uploads/files/${type}/${level}/${series}/${fileName}`;
+    const filePath = `../slim-server/uploads/files/${type}/${level}/${series}/${fileName}`;
 
     // Use res.download to trigger the file download
     res.download(filePath, (err) => {

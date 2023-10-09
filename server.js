@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const bodyParser = require('body-parser');
-const path = require('path');
 
 const user = require("./routes/userRoutes");
 const ordinance = require('./routes/uploadRoutes');
@@ -13,6 +12,7 @@ const uploads = require('./routes/uploadRoutes');
 const minutes = require('./routes/minutesRoutes');
 const public = require('./routes/publicRoutes');
 const audit = require('./routes/auditRoutes');
+const members = require('./routes/memberRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3500;
@@ -30,7 +30,16 @@ const conn = mongoose
   .catch((err) => console.log(err));
 
 //API Route
-app.use("/api", public, user, ordinance, email, uploads, minutes, audit);
+app.use("/api", 
+  public, 
+  user, 
+  ordinance, 
+  email, 
+  uploads, 
+  minutes, 
+  audit,
+  members,
+);
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
 // app.listen(PORT, HOST, () => console.log(`Server running on http://${HOST}:${PORT}`));
 

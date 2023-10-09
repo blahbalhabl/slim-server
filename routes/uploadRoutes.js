@@ -26,7 +26,7 @@ router.get('/count-ordinances', countOrdinances);
 router.get('/download/:fileName', auditTrail, downloadOrdinance);
 router.post('/update-proceedings/:filename', auditTrail, updateProceedings);
 router.post('/upload/ordinance/draft', file.single('file'), auditTrail, draftOrdinance);
-router.put('/update-ordinance/:fileName', file.single('file'), auditTrail, updateOrdinance);
+router.post('/update-ordinance/:fileName', file.single('file'), auditTrail, updateOrdinance);
 router.post('/upload-logo', image.single('file'), auditTrail, uploadLogo);
 router.delete('/delete-ordinance/:fileName', auditTrail, delOrdinance);
 
