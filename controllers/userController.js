@@ -136,14 +136,14 @@ const loginUser = async (req, res) => {
     const user = await UserModel.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({message: "User does not exist!"});
+      return res.status(400).json({message: "Invalid Email."});
     }
 
     // Compare hash password
     const passMatch = await bcrypt.compare(password, user.password);
 
     if (!passMatch) {
-      return res.status(400).json({message: "Invalid Credentials"});
+      return res.status(401).json({message: "Incorrect Password."});
     }
 
     if (user.is2faOn) {
@@ -255,7 +255,7 @@ const useOtp = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = await UserModel.find().lean().exec();
+    const users = await UserModel.find().select("-password -_id -is2faOn -refresh").lean().exec();
     const lgu = await UserModel.countDocuments({level: 'LGU'}).lean().exec();
     const dilg = await UserModel.countDocuments({level: 'DILG'}).lean().exec();
     const brgy = await UserModel.countDocuments({level: 'BARANGAY'}).lean().exec();
@@ -364,7 +364,7 @@ const checkUser = async (req, res) => {
     const user = await UserModel.findOne({ email: req.params.email });
 
     if (!user) {
-      return res.status(400).json({ message: "User does not exist!" });
+      return res.status(400).json({ message: "Invalid Email." });
     }
 
     const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -380,14 +380,10 @@ const forgotPassword = async (req, res) => {
     const { email, password, confirmPassword } = req.body;
     const user = await UserModel.findOne({ email: email });
 
-    if(!user) {
-      return res.status(400).json({message: 'User does not exist!'});
-    };
-
     const passMatch = await bcrypt.compare(password, user.password);
 
     if (passMatch) {
-      return res.status(400).json({message: 'New Password cannot be the same as Old Password!'});
+      return res.status(401).json({message: 'New Password cannot be the same as Old Password!'});
     };
   
     if(password === confirmPassword) {
