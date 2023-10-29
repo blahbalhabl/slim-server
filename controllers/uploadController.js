@@ -39,8 +39,11 @@ const draftOrdinance = async (req, res) => {
 
 const getOrdinances = async (req, res) => {
   try {
-    const { level, status } = req.query;
+    const { level, status, page } = req.query;
     const filters = { status }
+    const itemsPerPage = 1;
+
+    const skip = (page - 1) * itemsPerPage;
 
     if(status === 'all') {
       delete filters.status;
@@ -54,13 +57,18 @@ const getOrdinances = async (req, res) => {
       model = Ordinance;
     }
 
-    const response = await model.find(filters).sort({ number: 1 }).exec();
+    const response = await model
+      .find(filters)
+      .sort({ number: 1 })
+      .skip(skip)
+      .limit(itemsPerPage)
+      .exec();
 
     res.status(200).json(response);
   } catch (err) {
     res.satus(400).json({err: 'Something went wrong!'});
   }
-}
+};
 
 const getApprovedOrdinances = async (req, res) => {
   try {
@@ -73,7 +81,7 @@ const getApprovedOrdinances = async (req, res) => {
   } catch (err) {
     return res.status(500).json({err, message: 'Internal Server Error'});
   }
-}  
+};
 
 const countOrdinances = async (req, res) => {
   try {
@@ -97,7 +105,7 @@ const countOrdinances = async (req, res) => {
   } catch (err) {
     res.satus(400).json({err: 'Something went wrong!'});
   }
-}
+};
 
 //  Delete both file and Ordinance in Database
 const delOrdinance = async (req, res) => {
