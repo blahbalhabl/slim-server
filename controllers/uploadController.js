@@ -41,7 +41,7 @@ const getOrdinances = async (req, res) => {
   try {
     const { level, status, page } = req.query;
     const filters = { status }
-    const itemsPerPage = 1;
+    const itemsPerPage = 10;
 
     const skip = (page - 1) * itemsPerPage;
 
@@ -67,6 +67,28 @@ const getOrdinances = async (req, res) => {
     res.status(200).json(response);
   } catch (err) {
     res.satus(400).json({err: 'Something went wrong!'});
+  }
+};
+
+const searchOrdinance = async (req, res) => {
+  try {
+    const { level } = req.query;
+
+    let model;
+
+    if (level === 'BARANGAY') {
+      model = Barangay;
+    } else {
+      model = Ordinance;
+    }
+
+    const response = await model
+      .find()
+      .lean()
+      .exec();
+    res.status(200).json(response);
+  } catch (err) {
+    res.status(500).json({message: 'Internal Server Error!'});
   }
 };
 
@@ -239,4 +261,5 @@ module.exports = {
   downloadOrdinance,
   updateProceedings,
   getApprovedOrdinances,
+  searchOrdinance,
 }
