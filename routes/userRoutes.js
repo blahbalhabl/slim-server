@@ -24,7 +24,6 @@ const { image } = require('../middlewares/configureMulter')
 const router = Router();
 
 // General Routes
-router.get('/forgot-password', forgotPassword);
 router.post('/forgot-password/:email', checkUser);
 router.post("/login", loginUser);
 router.post("/verify", verifyOTP);
@@ -45,6 +44,5 @@ router.post("/signup", createUser);
 router.post('/change-password', changePassword);
 router.post('/avatar-upload', image.single('avatar'), avatarUpload);
 router.delete('/delete-avatar/:fileName', delAvatar);
-
 
 module.exports = router;

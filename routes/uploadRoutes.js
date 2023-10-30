@@ -11,6 +11,7 @@ const {
    countOrdinances,
    downloadOrdinance,
    updateProceedings,
+   searchOrdinance,
 } = require('../controllers/uploadController');
 const { uploadLogo } = require('../controllers/avatarController');
 
@@ -23,6 +24,7 @@ router.use(verify);
 router.use('/uploads/files', express.static('uploads/files'));
 router.get('/ordinances', getOrdinances);
 router.get('/count-ordinances', countOrdinances);
+router.get('/search-ordinances', searchOrdinance); // Search Function
 router.get('/download/:fileName', auditTrail, downloadOrdinance);
 router.post('/update-proceedings/:filename', auditTrail, updateProceedings);
 router.post('/upload/ordinance/draft', file.single('file'), auditTrail, draftOrdinance);
