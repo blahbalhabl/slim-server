@@ -29,6 +29,10 @@ const minutesSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  level: {
+    type: String,
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now(),
