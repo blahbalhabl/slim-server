@@ -204,6 +204,29 @@ const updateOrdinance = async (req, res) => {
   }
 };
 
+const getProceeding = async (req, res) => {
+  try {
+    const { level, id } = req.query;
+    let model;
+
+    level === 'Barangay' ? (model = Barangay) : (model = Ordinance);
+
+    const proceedings = await model
+      .findById(id)
+      .lean()
+      .exec();
+
+    if(proceedings.length === 0) {
+      return res.status(400).json({message: 'No Proceeding with this ID'});
+    };
+
+    return res.status(200).json(proceedings);
+
+  } catch(err) {
+    res.status(500).json({err, message: 'Internal Server Error'});
+  }
+};
+
 const getProceedings = async (req, res) => {
   try {
     const { level } = req.query;
@@ -286,4 +309,5 @@ module.exports = {
   getApprovedOrdinances,
   searchOrdinance,
   getProceedings,
+  getProceeding,
 }
