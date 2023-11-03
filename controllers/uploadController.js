@@ -204,13 +204,36 @@ const updateOrdinance = async (req, res) => {
   }
 };
 
+const getProceedings = async (req, res) => {
+  try {
+    const { level } = req.query;
+    let model;
+
+    level === 'Barangay' ? (model = Barangay) : (model = Ordinance);
+
+    const today = new Date();
+    const proceedings = await model
+      .find({proceedings: { $gte: today }})
+      .select('title proceedings status')
+      .lean()
+      .exec();
+
+    if(proceedings.length === 0) {
+      return res.status(400).json({message: 'No Proceedings Exists!'});
+    }
+
+    return res.status(200).json(proceedings);
+  } catch (err) {
+    res.status(500).json({message: 'Interal Server Error'})
+  }
+};
+
 const updateProceedings = async (req, res) => {
   try {
     const proceedings = req.body;
     const fileName = req.params.filename;
     const { level } = req.query;
 
-    console.log(req.body)
     let model;
 
     if (level === 'BARANGAY') {
@@ -262,4 +285,5 @@ module.exports = {
   updateProceedings,
   getApprovedOrdinances,
   searchOrdinance,
+  getProceedings,
 }
