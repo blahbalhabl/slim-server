@@ -375,6 +375,29 @@ const checkUser = async (req, res) => {
   }
 };
 
+const checkPass = async (req, res) => {
+  try {
+    const userId = req.id;
+    const { deletePass } = req.body;
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({ message: "User not Found." });
+    }
+
+    const passMatch = await bcrypt.compare(deletePass, user.password);
+
+    if (!passMatch) {
+      return res.status(400).json({message: 'Incorrect Password'});
+    }
+
+    return res.status(204).json({message: 'Correct'});
+    
+  } catch (err) {
+    res.status(500).json({err, message: 'Internal Server Error'});
+  }
+};
+
 const forgotPassword = async (req, res) => {
   try {
     const { email, password, confirmPassword } = req.body;
@@ -413,4 +436,5 @@ module.exports = {
   changePassword,
   forgotPassword,
   checkUser,
+  checkPass,
 };
