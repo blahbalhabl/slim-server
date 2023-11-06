@@ -177,7 +177,7 @@ const loginUser = async (req, res) => {
       });
     }
   } catch (err) {
-    return res.status(400).json({ err, message: "User does not exist" });
+    return res.status(500).json({ err, message: "User does not exist" });
   }
 };
 
@@ -186,13 +186,9 @@ const verifyOTP = async (req, res) => {
     const { email, otp } = req.body;
     const user = await UserModel.findOne({ email });
 
-    if (!user) {
-      return res.status(400).json("User does not exist!");
-    }
-
-    if (!user.is2faOn) {
+    if (!user?.is2faOn) {
       return res.status(400).json("2FA not enabled for this user");
-    }
+    };
 
     const isValid = speakeasy.totp.verify({
       secret: user.secret,
@@ -226,10 +222,10 @@ const verifyOTP = async (req, res) => {
         token: accessToken,
       });
     } else {
-      return res.status(400).json({message: "Invalid OTP"});
+      return res.status(402).json({message: "Invalid OTP"});
     }
   } catch (err) {
-    return res.status(500).json({ err, msg: "Internal Server Error" });
+    return res.status(500).json({ err, message: "Internal Server Error" });
   }
 };
 
