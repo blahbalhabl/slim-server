@@ -255,7 +255,7 @@ const useOtp = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = await UserModel.find().select("-password -_id -is2faOn -refresh").lean().exec();
+    const users = await UserModel.find().select("-password -is2faOn -refresh").lean().exec();
     const lgu = await UserModel.countDocuments({level: 'LGU'}).lean().exec();
     const dilg = await UserModel.countDocuments({level: 'DILG'}).lean().exec();
     const brgy = await UserModel.countDocuments({level: 'BARANGAY'}).lean().exec();

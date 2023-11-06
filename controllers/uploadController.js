@@ -53,8 +53,10 @@ const getOrdinances = async (req, res) => {
 
     if (level === 'BARANGAY') {
       model = Barangay;
-    } else {
+    } else if (level === 'LGU') {
       model = Ordinance;
+    } else if (level === 'DILG') {
+      model = Ordinance
     }
 
     const response = await model
@@ -78,8 +80,10 @@ const searchOrdinance = async (req, res) => {
 
     if (level === 'BARANGAY') {
       model = Barangay;
-    } else {
+    } else if (level === 'LGU') {
       model = Ordinance;
+    } else if (level === 'DILG') {
+      model = Ordinance
     }
 
     const response = await model
@@ -111,11 +115,14 @@ const countOrdinances = async (req, res) => {
     let response = {};
     let model;
 
-    if(level === 'BARANGAY') {
+    if (level === 'BARANGAY') {
       model = Barangay;
-    } else {
+    } else if (level === 'LGU') {
       model = Ordinance;
+    } else if (level === 'DILG') {
+      model = Ordinance
     }
+    
     response.all = await model.countDocuments().exec();
     response.pending = await model.countDocuments({status: 'pending'}).exec();
     response.vetoed = await model.countDocuments({status: 'vetoed'}).exec();
@@ -279,10 +286,39 @@ const updateProceedings = async (req, res) => {
 
 const downloadOrdinance = (req, res) => {
   try {
-    const { level, series, type } = req.query;
+    const { level, series, type, acl } = req.query;
     const fileName = req.params.fileName;
-    const filePath = path.join(__dirname, '..', 'uploads', 'files', type, level, series, fileName);
+    let filePath;
+    if (level !== 'DILG') {
+      filePath = path.join(__dirname, '..', 'uploads', 'files', type, level, series, fileName);
+    } else {
+      filePath = path.join(__dirname, '..', 'uploads', 'files', type, acl, series, fileName);
+    }
+    
+    // Use res.download to trigger the file download
+    res.download(filePath, (err) => {
+      if (err) {
+        console.error('Error downloading file:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
+      }
+    });
+  } catch (err) {
+    console.error('Error in downloadOrdinance:', err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
+const viewOrdinance = (req, res) => {
+  try {
+    const { level, series, type, acl } = req.query;
+    const fileName = req.params.fileName;
+    let filePath;
+    if (level !== 'DILG') {
+      filePath = path.join(__dirname, '..', 'uploads', 'files', type, level, series, fileName);
+    } else {
+      filePath = path.join(__dirname, '..', 'uploads', 'files', type, acl, series, fileName);
+    }
+    
     // Use res.download to trigger the file download
     res.download(filePath, (err) => {
       if (err) {
@@ -305,6 +341,7 @@ module.exports = {
   updateOrdinance,
   updateOrdinance,
   downloadOrdinance,
+  viewOrdinance,
   updateProceedings,
   getApprovedOrdinances,
   searchOrdinance,
