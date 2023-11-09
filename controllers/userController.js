@@ -11,6 +11,7 @@ const createAccessToken = (user) => {
       id: user._id,
       name: user.username,
       role: user.role,
+      level: user.level,
     },
     process.env.ACCESS_SECRET,
     { expiresIn: `${process.env.ACCESS_EXPIRES}s` }
@@ -23,6 +24,7 @@ const createRefreshToken = (user) => {
       id: user._id,
       name: user.username,
       role: user.role,
+      level: user.level,
     },
     process.env.REFRESH_SECRET,
     { expiresIn: `${process.env.REFRESH_EXPIRES}s` }

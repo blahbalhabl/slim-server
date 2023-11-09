@@ -39,7 +39,8 @@ const draftOrdinance = async (req, res) => {
 
 const getOrdinances = async (req, res) => {
   try {
-    const { level, status, page } = req.query;
+    const level = req.level;
+    const { status, page, series } = req.query;
     const filters = { status }
     const itemsPerPage = 10;
 
@@ -59,16 +60,31 @@ const getOrdinances = async (req, res) => {
       model = Ordinance
     }
 
-    const response = await model
+    let highestSeries;
+
+    if (series) {
+      // When a specific series is requested, fetch ordinances for that series
+      filters.series = series;
+    } else {
+      // Determine the highest series value
+      highestSeries = await model.aggregate([{ $group: { _id: null, max: { $max: '$series' } } }]).exec();
+      if (highestSeries.length > 0) {
+        filters.series = highestSeries[0].max;
+      }
+    };
+
+    const ordinances = await model
       .find(filters)
       .sort({ number: 1 })
       .skip(skip)
       .limit(itemsPerPage)
       .exec();
 
-    res.status(200).json(response);
+    const distSeries = await model.find().distinct('series').exec();
+
+    res.status(200).json({ordinances, series: distSeries, highest: highestSeries});
   } catch (err) {
-    res.satus(400).json({err: 'Something went wrong!'});
+    res.status(400).json({err, message: 'Something went wrong!'});
   }
 };
 
@@ -331,7 +347,6 @@ const viewOrdinance = (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
-
 
 module.exports = {
   draftOrdinance,
