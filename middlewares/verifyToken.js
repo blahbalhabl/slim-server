@@ -16,6 +16,8 @@ const verify = (req, res, next) => {
       return res.status(401).json("Invalid Token");
     }
     req.id = payload.id;
+    req.role = payload.role;
+    req.level = payload.level;
     next();
   });
 };
