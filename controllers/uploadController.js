@@ -8,8 +8,9 @@ const draftOrdinance = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({err: 'No file found!'})
     }
-  
-    const { number, series, title, status, level, author } = req.body;
+    
+    const level = req.level
+    const { number, series, title, status, author } = req.body;
     const file = req.file.filename;
     const size = req.file.size / 1024;
     const rounded = Math.round(size * 100) / 100;
@@ -90,7 +91,7 @@ const getOrdinances = async (req, res) => {
 
 const searchOrdinance = async (req, res) => {
   try {
-    const { level } = req.query;
+    const level = req.level;
 
     let model;
 
@@ -127,7 +128,7 @@ const getApprovedOrdinances = async (req, res) => {
 
 const countOrdinances = async (req, res) => {
   try {
-    const level = req.query.level;
+    const level = req.level;
     let response = {};
     let model;
 
@@ -155,7 +156,8 @@ const countOrdinances = async (req, res) => {
 //  Delete both file and Ordinance in Database
 const delOrdinance = async (req, res) => {
   try {
-    const { level, series, type } = req.query;
+    const level = req.level;
+    const { series, type } = req.query;
     const fileName = req.params.fileName;
 
     // Delete the file from the server
@@ -186,7 +188,8 @@ const delOrdinance = async (req, res) => {
 const updateOrdinance = async (req, res) => {
   try {
     const updateData = req.body;
-    const { level, series, type } = req.query;
+    const level = req.level
+    const { series, type } = req.query;
     const fileName = req.params.fileName;
     let updateFile = fileName;
 
@@ -229,7 +232,8 @@ const updateOrdinance = async (req, res) => {
 
 const getProceeding = async (req, res) => {
   try {
-    const { level, id } = req.query;
+    const level = req.level;
+    const { id } = req.query;
     let model;
 
     level === 'Barangay' ? (model = Barangay) : (model = Ordinance);
@@ -252,7 +256,7 @@ const getProceeding = async (req, res) => {
 
 const getProceedings = async (req, res) => {
   try {
-    const { level } = req.query;
+    const level = req.level;
     let model;
 
     level === 'Barangay' ? (model = Barangay) : (model = Ordinance);
@@ -278,7 +282,7 @@ const updateProceedings = async (req, res) => {
   try {
     const proceedings = req.body;
     const fileName = req.params.filename;
-    const { level } = req.query;
+    const level = req.level;
 
     let model;
 
@@ -302,7 +306,8 @@ const updateProceedings = async (req, res) => {
 
 const downloadOrdinance = (req, res) => {
   try {
-    const { level, series, type, acl } = req.query;
+    const level = req.level;
+    const { series, type, acl } = req.query;
     const fileName = req.params.fileName;
     let filePath;
     if (level !== 'DILG') {
@@ -326,7 +331,8 @@ const downloadOrdinance = (req, res) => {
 
 const viewOrdinance = (req, res) => {
   try {
-    const { level, series, type, acl } = req.query;
+    const level = req.level;
+    const { series, type, acl } = req.query;
     const fileName = req.params.fileName;
     let filePath;
     if (level !== 'DILG') {

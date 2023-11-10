@@ -306,7 +306,6 @@ const updateUser = async (req, res) => {
 };
 
 const logoutUser = async (req, res) => {
-
   const refresh = req.cookies.refresh;
   if(!refresh) return res.status(200).json({msg: "No Cookies Found"});
 
@@ -389,7 +388,7 @@ const checkPass = async (req, res) => {
       return res.status(400).json({message: 'Incorrect Password'});
     }
 
-    return res.status(204).json({message: 'Correct'});
+    return res.status(200).json({message: 'Correct'});
     
   } catch (err) {
     res.status(500).json({err, message: 'Internal Server Error'});
