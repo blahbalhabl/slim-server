@@ -4,7 +4,7 @@ const Barangay = require('../models/brgyOrdModel');
 
 const getAllMinutes = async (req, res) => {
 	try {
-		const { level } = req.query;
+		const level = req.level;
 		let model;
 
 		level === 'Barangay'
@@ -29,7 +29,7 @@ const getAllMinutes = async (req, res) => {
 
 const getMinutes = async (req, res) => {
   try {
-		const ordinanceId = req.params
+		const ordinanceId = req.params;
 		const minutes = await Minutes.find(ordinanceId).exec();
 		res.status(200).json(minutes);
 	} catch(err) {
@@ -45,14 +45,15 @@ const postMinutes = async (req, res) => {
 			description, 
 			speaker, 
 			series } = req.body;
-		const { ordinanceId, level, status } = req.query;
+		const level = req.level;
+		const { ordinanceId } = req.query;
 
 		if (!req.file) {
 			return res.status(400).json({message: 'No file Selected'});
 		}
 		const file = req.file.filename;
 
-		await Minutes.create({ordinanceId: ordinanceId, date, agenda, description, speaker, series, level, status, file: file});
+		await Minutes.create({ordinanceId: ordinanceId, date, agenda, description, speaker, series, level, file: file});
 		return res.status(200).json({message: 'Uploaded Minutes of the Meeting'});
 	} catch (err) {
 		return res.status(500).json({err, message: 'Internal Server Error'});
