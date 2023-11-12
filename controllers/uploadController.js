@@ -10,7 +10,7 @@ const draftOrdinance = async (req, res) => {
     }
     
     const level = req.level
-    const { number, series, title, status, author } = req.body;
+    const { number, series, title, status, author, coAuthor } = req.body;
     const file = req.file.filename;
     const size = req.file.size / 1024;
     const rounded = Math.round(size * 100) / 100;
@@ -26,15 +26,15 @@ const draftOrdinance = async (req, res) => {
     const exists = await model.findOne({ number });
 
     if(exists) {
-      return res.status(400).json('Ordinance is Already Existing!')
+      return res.status(400).json({message: 'Ordinance is Already Existing.'})
     }
   
     // Create the ordinance in Barangay or Ordinance Schema
-    await model.create({ number, title, series, status, file, mimetype, accessLevel: level, size: rounded, author });
+    await model.create({ number, title, series, status, file, mimetype, accessLevel: level, size: rounded, author, coAuthor });
 
-    res.status(200).json({message: 'Successfully Uploaded!'});
+    return res.status(200).json({message: 'Successfully Uploaded Ordinance.'});
   } catch (err) {
-    res.status(400).json({Error: err, message: 'Something went wrong.'});
+    res.status(400).json({err, message: 'Internal Server Error.'});
   }
 };
 
@@ -263,7 +263,9 @@ const getProceedings = async (req, res) => {
 
     const today = new Date();
     const proceedings = await model
-      .find({proceedings: { $gte: today }})
+      // .find({proceedings: { $gte: today }})
+      .find()
+      .sort({ proceedings: -1 })
       .select('title proceedings status')
       .lean()
       .exec();

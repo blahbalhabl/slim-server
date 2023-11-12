@@ -19,6 +19,10 @@ const brgySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  brgy: {
+    type: String,
+    required: true,
+  },
   file: {
     type: String,
     required: true,

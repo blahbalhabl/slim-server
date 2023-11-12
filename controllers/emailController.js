@@ -26,7 +26,18 @@ const sendEmail = async (req, res) => {
       },
     });
 
+    // const transport = nodemailer.createTransport({
+    //   host: 'smtp.privateemail.com',
+    //   port: 465,
+    //   secure: true,
+    //   auth: {
+    //     user: 'noreply@slim-bacolor.online',
+    //     pass: 'Slimnoreply102427'
+    //   }
+    // });
+
     const mailOptions = {
+      // from: `SLIM <noreply@slim-bacolor.online>`,
       from: `SLIM <${process.env.G_MAIL}>`,
       to: email,
       subject: subject,
@@ -43,28 +54,38 @@ const sendEmail = async (req, res) => {
 const forgotEmail = async (req, res) => {
   try {
     const {email, subject, html} = req.body;
-    const accessToken = await oAuth2Client.getAccessToken();
+    // const accessToken = await oAuth2Client.getAccessToken();
+
+    // const transport = nodemailer.createTransport({
+    //   service: 'gmail',
+    //   auth: {
+    //     type: 'OAuth2',
+    //     user: process.env.G_MAIL,
+    //     clientId: process.env.CLIENT_ID,
+    //     clientSecret: process.env.CLIENT_SECRET,
+    //     refreshToken: process.env.REFRESH_TOKEN,
+    //     accessToken: accessToken,
+    //   },
+    // });
 
     const transport = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'mail.privateemail.com',
+      port: 587,
+      secure: false,
       auth: {
-        type: 'OAuth2',
-        user: process.env.G_MAIL,
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        refreshToken: process.env.REFRESH_TOKEN,
-        accessToken: accessToken,
-      },
+        user: 'noreply@slim-bacolor.online',
+        pass: 'Slimnoreply102427'
+      }
     });
 
     const mailOptions = {
-      from: `FORGOT PASSWORD? <${process.env.G_MAIL}>`,
+      from: `Forgot Password? <noreply@slim-bacolor.online>`,
       to: email,
       subject: subject,
       html: html,
     }
 
-    const result = await transport.sendMail(mailOptions)
+    const result = await transport.sendMail(mailOptions);
     return res.status(200).json(result);
   } catch (err) {
     return res.status(500).json({err, message: 'Internal Server Error'});

@@ -17,7 +17,6 @@ const forgot = require('./routes/forgotEmailRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3500;
-// const HOST = process.env.HOST;
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
@@ -43,6 +42,5 @@ app.use("/api",
   members,
 );
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
-// app.listen(PORT, HOST, () => console.log(`Server running on http://${HOST}:${PORT}`));
 
 module.exports = conn;
