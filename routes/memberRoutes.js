@@ -6,7 +6,7 @@ const router = Router();
 router.use(verify);
 
 router.get('/sanggunian-members', getMembers);
-router.put('/update-member', updateMember)
+router.put('/update-member', updateMember);
 router.post('/new-member', uploadMember);
 
 module.exports = router;

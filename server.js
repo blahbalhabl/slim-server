@@ -14,6 +14,7 @@ const public = require('./routes/publicRoutes');
 const audit = require('./routes/auditRoutes');
 const members = require('./routes/memberRoutes');
 const forgot = require('./routes/forgotEmailRoutes');
+const proceeding = require('./routes/proceedingRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3500;
@@ -40,6 +41,7 @@ app.use("/api",
   minutes, 
   audit,
   members,
+  proceeding,
 );
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
 

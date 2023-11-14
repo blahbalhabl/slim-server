@@ -15,6 +15,7 @@ const {
    getProceedings,
    getProceeding,
    viewOrdinance,
+   getOrdinance,
 } = require('../controllers/uploadController');
 const { uploadLogo } = require('../controllers/avatarController');
 
@@ -26,6 +27,7 @@ router.use(verify);
 // Serve the uploaded files from the 'uploads' directory
 router.use('/uploads/files', express.static('uploads/files'));
 router.get('/ordinances', getOrdinances);
+router.get('/ordinance', getOrdinance);
 router.get('/count-ordinances', countOrdinances);
 router.get('/search-ordinances', searchOrdinance); // Search Function
 router.get('/download/:fileName', auditTrail, downloadOrdinance);

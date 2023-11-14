@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  isMember: {
+    type: Boolean,
+    requred: true,
+    default: false,
+  },
   is2faOn: {
     type: Boolean,
     required: true,

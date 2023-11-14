@@ -420,6 +420,27 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+const delUser = async (req, res) => {
+  try {
+    const role = req.role;
+    const { id } = req.query;
+
+    if (role !== 'Superadmin') {
+      return res.status(403).json({message: 'Forbidden Action.'});
+    };
+
+    const deleteUser = await UserModel.findByIdAndDelete(id);
+
+    if (!deleteUser) {
+      return res.status(400).json({message: 'No User Found.'});
+    }
+
+    res.status(200).json({message: 'Deleted User Success.'})
+  } catch(err) {
+    res.status(500).json({err, message: 'Interal Server Error.'});
+  }
+};
+
 module.exports = {
   getUsers,
   getUser,
@@ -434,4 +455,5 @@ module.exports = {
   forgotPassword,
   checkUser,
   checkPass,
+  delUser,
 };

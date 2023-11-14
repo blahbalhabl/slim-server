@@ -48,6 +48,10 @@ const brgySchema = new mongoose.Schema({
     required: false,
     default: Date.now(),
   },
+  endTime: {
+    type: Date,
+    required: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now(),

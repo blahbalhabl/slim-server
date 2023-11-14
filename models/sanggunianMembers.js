@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
 const memberSchema = new mongoose.Schema({
-  avatar: {
-    type: String,
-    required: false,
-  },
   email: {
     type: String,
     required: true,

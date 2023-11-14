@@ -89,6 +89,27 @@ const getOrdinances = async (req, res) => {
   }
 };
 
+const getOrdinance = async (req, res) => {
+  try {
+    const level = req.level;
+    const { id } = req.query;
+    let model;
+
+    level === 'Barangay' ? (model = Barangay) : (model = Ordinance);
+
+    const ordinance = await model.findById(id);
+
+    if(!ordinance) {
+      return res.status(400).json({message: 'Ordinance Not Found.'});
+    }
+
+    res.status(200).json(ordinance);
+
+  } catch (err) {
+    res.status(500).json({err, message: 'Internal Server Error.'});
+  }
+}
+
 const searchOrdinance = async (req, res) => {
   try {
     const level = req.level;
@@ -261,12 +282,12 @@ const getProceedings = async (req, res) => {
 
     level === 'Barangay' ? (model = Barangay) : (model = Ordinance);
 
-    const today = new Date();
+    // const today = new Date();
     const proceedings = await model
       // .find({proceedings: { $gte: today }})
       .find()
       .sort({ proceedings: -1 })
-      .select('title proceedings status')
+      .select('number series title proceedings endTime status')
       .lean()
       .exec();
 
@@ -282,7 +303,7 @@ const getProceedings = async (req, res) => {
 
 const updateProceedings = async (req, res) => {
   try {
-    const proceedings = req.body;
+    const { proceeding, endTime } = req.body;
     const fileName = req.params.filename;
     const level = req.level;
 
@@ -296,7 +317,7 @@ const updateProceedings = async (req, res) => {
 
     await model.findOneAndUpdate(
       { file: fileName },
-      { $set: proceedings},
+      { $set: { proceedings: proceeding, endTime }},
       { new: true }
     );
     
@@ -304,7 +325,7 @@ const updateProceedings = async (req, res) => {
   } catch (err) {
     return res.status(500).json({err, message: 'Internal Server Error'});
   }
-}
+};
 
 const downloadOrdinance = (req, res) => {
   try {
@@ -359,6 +380,7 @@ const viewOrdinance = (req, res) => {
 module.exports = {
   draftOrdinance,
   getOrdinances,
+  getOrdinance,
   countOrdinances,
   delOrdinance,
   updateOrdinance,
