@@ -14,6 +14,7 @@ const {
   updateUser,
   checkUser,
   checkPass,
+  delUser,
 } = require("../controllers/userController");
 const { 
   avatarUpload, 
@@ -46,5 +47,6 @@ router.post("/check-pass", checkPass);
 router.post('/change-password', changePassword);
 router.post('/avatar-upload', image.single('avatar'), avatarUpload);
 router.delete('/delete-avatar/:fileName', delAvatar);
+router.delete('/delete-user', delUser);
 
 module.exports = router;

@@ -19,6 +19,10 @@ const brgySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  brgy: {
+    type: String,
+    required: true,
+  },
   file: {
     type: String,
     required: true,
@@ -43,6 +47,10 @@ const brgySchema = new mongoose.Schema({
     type: Date,
     required: false,
     default: Date.now(),
+  },
+  endTime: {
+    type: Date,
+    required: false,
   },
   createdAt: {
     type: Date,

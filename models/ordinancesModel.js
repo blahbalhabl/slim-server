@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const Minutes = require('./minutesModel');
 
 const ordinanceSchema = new mongoose.Schema({
   number: {
@@ -40,10 +39,24 @@ const ordinanceSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  coAuthor: {
+    type: String,
+    required: false,
+    default: null,
+  },
+  proponents: {
+    type: [String],
+    required: false,
+    default: [],
+  },
   proceedings: {
     type: Date,
     required: false,
     default: Date.now(),
+  },
+  endTime: {
+    type: Date,
+    required: false,
   },
   createdAt: {
     type: Date,

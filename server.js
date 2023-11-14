@@ -14,10 +14,10 @@ const public = require('./routes/publicRoutes');
 const audit = require('./routes/auditRoutes');
 const members = require('./routes/memberRoutes');
 const forgot = require('./routes/forgotEmailRoutes');
+const proceeding = require('./routes/proceedingRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3500;
-// const HOST = process.env.HOST;
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
@@ -41,8 +41,8 @@ app.use("/api",
   minutes, 
   audit,
   members,
+  proceeding,
 );
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
-// app.listen(PORT, HOST, () => console.log(`Server running on http://${HOST}:${PORT}`));
 
 module.exports = conn;
