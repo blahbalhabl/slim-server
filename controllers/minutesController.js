@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const Minutes = require('../models/minutesModel');
 const Municipal = require('../models/ordinancesModel');
 const Barangay = require('../models/brgyOrdModel');
@@ -35,7 +37,7 @@ const getMinutes = async (req, res) => {
 	} catch(err) {
 		res.status(500).json({err, message: 'Internal Server Error'});
 	}
-}
+};
 
 const postMinutes = async (req, res) => {
 	try {
@@ -58,11 +60,60 @@ const postMinutes = async (req, res) => {
 	} catch (err) {
 		return res.status(500).json({err, message: 'Internal Server Error'});
 	}
-}
+};
 
+const updateMinutes = async (req, res) => {
+  try {
+    const updateData = req.body;
+    const level = req.level;
+    const { series, id, fileName, type } = req.query;
+    let updateFile = fileName;
+
+    console.log('updateData:', updateData);
+    console.log('series:', series);
+    console.log('id:', id);
+    console.log('filename:', fileName);
+
+    if (req.file !== '') {
+      updateFile = req.file.filename;
+      updateData.file = updateFile;
+    }
+
+    const exists = await Minutes.findById(id);
+
+    if (!exists) {
+      return res.status(400).json({ message: 'Minutes is non-existent.' });
+    }
+
+    if (req.file !== '') {
+      // Delete the file from the server if there is a file
+      const filePath = path.join(__dirname, '..', 'uploads', 'files', type, level, series, fileName);
+
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+
+      // Set the updateFile to the new filename
+      updateFile = req.file.filename;
+      updateData.file = updateFile;
+    }
+
+    await Minutes.findByIdAndUpdate(
+      id,
+      { $set: updateData, file: updateFile },
+      { new: true }
+    );
+
+    res.status(200).json({ message: 'Minutes Successfully updated.' });
+
+  } catch (err) {
+    res.status(500).json({ err, message: 'Internal Server Error.' });
+  }
+};
 
 module.exports = {
 	getMinutes,
 	getAllMinutes,
 	postMinutes,
+	updateMinutes,
 }

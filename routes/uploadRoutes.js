@@ -34,7 +34,7 @@ router.get('/download/:fileName', auditTrail, downloadOrdinance);
 router.get('/view/:fileName', viewOrdinance);
 router.get('/proceedings', getProceedings);
 router.get('/proceeding', getProceeding);
-router.post('/update-proceedings/:filename', auditTrail, updateProceedings);
+router.post('/update-proceedings/:filename', updateProceedings);
 router.post('/upload/ordinance/draft', file.single('file'), auditTrail, draftOrdinance);
 router.post('/update-ordinance/:fileName', file.single('file'), auditTrail, updateOrdinance);
 router.post('/upload-logo', image.single('file'), auditTrail, uploadLogo);
