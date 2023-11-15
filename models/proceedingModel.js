@@ -9,6 +9,14 @@ const proceedingSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  startTime: {
+    type: Date,
+    required: true,
+  },
+  endTime: {
+    type: Date,
+    required: true,
+  },
   attended: [
     {
       name: { 
@@ -19,6 +27,10 @@ const proceedingSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false,
+      },
+      timePresent: {
+        type: Date,
+        required: false,
       },
     },
   ],
