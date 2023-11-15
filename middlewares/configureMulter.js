@@ -29,7 +29,7 @@ const fileStorage = multer.diskStorage({
   destination(req, file, cb) {
    // Get Series Year & Level
    const year = req.body.series || 'unknown';
-   const level = req.body.level || 'unknown';
+   const level = req.level || 'unknown';
    const type = req.query.type || 'unknown';
 
    // Create the dynamic subfolder structure
@@ -47,7 +47,7 @@ const fileStorage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedFile = ['application/pdf', 'application/rtf'];
+  const allowedFile = ['application/pdf'];
   if (allowedFile.includes(file.mimetype)) {
     cb(null, true);
   } else {
