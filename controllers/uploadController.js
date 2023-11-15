@@ -384,7 +384,6 @@ module.exports = {
   countOrdinances,
   delOrdinance,
   updateOrdinance,
-  updateOrdinance,
   downloadOrdinance,
   viewOrdinance,
   updateProceedings,
