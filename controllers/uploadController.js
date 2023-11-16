@@ -352,6 +352,26 @@ const downloadOrdinance = (req, res) => {
   }
 };
 
+const downloadPublicOrdinance = (req, res) => {
+  try {
+    const { series, type } = req.query;
+    const fileName = req.params.fileName;
+
+    const filePath = path.join(__dirname, '..', 'uploads', 'files', type, 'LGU', series, fileName);
+    
+    // Use res.download to trigger the file download
+    res.download(filePath, (err) => {
+      if (err) {
+        console.error('Error downloading file:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
+      }
+    });
+  } catch (err) {
+    console.error('Error in downloadOrdinance:', err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 const viewOrdinance = (req, res) => {
   try {
     const level = req.level;
@@ -385,6 +405,7 @@ module.exports = {
   delOrdinance,
   updateOrdinance,
   downloadOrdinance,
+  downloadPublicOrdinance,
   viewOrdinance,
   updateProceedings,
   getApprovedOrdinances,
