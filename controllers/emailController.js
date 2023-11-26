@@ -37,8 +37,7 @@ const sendEmail = async (req, res) => {
     });
 
     const mailOptions = {
-      // from: `SLIM <noreply@slim-bacolor.online>`,
-      from: `SLIM <${process.env.G_MAIL}>`,
+      from: `SLIM <${process.env.EMAIL}>`,
       to: email,
       subject: subject,
       html: html,
