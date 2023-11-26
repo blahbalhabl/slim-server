@@ -366,9 +366,14 @@ const checkUser = async (req, res) => {
 
     const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
 
-    return res.status(200).json({ otp: otpCode,  message: "User Found!" });
+    // Save the OTP, user email, and timestamp in the database
+    user.otpCode = otpCode;
+    user.otpTimestamp = Date.now();
+    await user.save();
+
+    return res.status(200).json({ message: "User Found!" });
   } catch (err) {
-    return res.status(500).json({err, message: 'Internal Server Error'});
+    return res.status(500).json({ err, message: 'Internal Server Error' });
   }
 };
 
