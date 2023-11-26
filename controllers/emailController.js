@@ -1,31 +1,10 @@
 require("dotenv").config();
 const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
-
-// const oAuth2Client = new google.auth.OAuth2( 
-//   process.env.CLIENT_ID, 
-//   process.env.CLIENT_SECRET, 
-//   process.env.REDIRECT_URI
-// )
-// oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN});
+const User = require('../models/userModel');
 
 const sendEmail = async (req, res) => {
   const {email, subject, html} = req.body;
   try {
-    // const accessToken = await oAuth2Client.getAccessToken();
-
-    // const transport = nodemailer.createTransport({
-    //   service: 'gmail',
-    //   auth: {
-    //     type: 'OAuth2',
-    //     user: process.env.G_MAIL,
-    //     clientId: process.env.CLIENT_ID,
-    //     clientSecret: process.env.CLIENT_SECRET,
-    //     refreshToken: process.env.REFRESH_TOKEN,
-    //     accessToken: accessToken,
-    //   },
-    // });
-
     const transport = nodemailer.createTransport({
       host: process.env.HOST,
       port: 465,
@@ -43,30 +22,16 @@ const sendEmail = async (req, res) => {
       html: html,
     }
 
-    const result = await transport.sendMail(mailOptions)
+    const result = await transport.sendMail(mailOptions);
     return res.status(200).json(result);
   } catch (err) {
     return res.status(500).json({err, message: 'Internal Server Error'});
   }
-}
+};
 
 const forgotEmail = async (req, res) => {
+  const {email, subject} = req.body;
   try {
-    const {email, subject, html} = req.body;
-    // const accessToken = await oAuth2Client.getAccessToken();
-
-    // const transport = nodemailer.createTransport({
-    //   service: 'gmail',
-    //   auth: {
-    //     type: 'OAuth2',
-    //     user: process.env.G_MAIL,
-    //     clientId: process.env.CLIENT_ID,
-    //     clientSecret: process.env.CLIENT_SECRET,
-    //     refreshToken: process.env.REFRESH_TOKEN,
-    //     accessToken: accessToken,
-    //   },
-    // });
-
     const transport = nodemailer.createTransport({
       host: process.env.HOST,
       port: 465,
@@ -77,21 +42,42 @@ const forgotEmail = async (req, res) => {
       }
     });
 
+    const user = await User.findOne({email: email});
+
+    if (!user || !user.otpCode || !user.otpTimestamp) {
+      return res.status(400).json({ message: "Invalid request." });
+    };
+
+    const currentTime = Date.now();
+    const otpExpirationTime = user.otpTimestamp + 300000;
+
+    if (currentTime > otpExpirationTime) {
+      return res.status(400).json({ message: "OTP has expired." });
+    }
+
     const mailOptions = {
-      from: `Forgot Password? <noreply@slim-bacolor.online>`,
+      from: `SLIM <${process.env.EMAIL}>`,
       to: email,
       subject: subject,
-      html: html,
+      html: `
+      <h1>Verification Code:</h1> 
+      <h3>Verify this code if you requested the forgot password</h3>
+      </br>
+      </br>
+      <h2>${user.otpCode}</h2>
+      <p>This code will only be valid for 5 minutes</p>
+      <p>If you did not make this request please contact support.</p>`,
     }
 
     const result = await transport.sendMail(mailOptions);
+    
     return res.status(200).json(result);
   } catch (err) {
     return res.status(500).json({err, message: 'Internal Server Error'});
   }
-}
+};
 
 module.exports = { 
-  sendEmail, 
+  sendEmail,
   forgotEmail,
 };
