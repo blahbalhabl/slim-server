@@ -2,39 +2,39 @@ require("dotenv").config();
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 
-const oAuth2Client = new google.auth.OAuth2( 
-  process.env.CLIENT_ID, 
-  process.env.CLIENT_SECRET, 
-  process.env.REDIRECT_URI
-)
-oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN});
+// const oAuth2Client = new google.auth.OAuth2( 
+//   process.env.CLIENT_ID, 
+//   process.env.CLIENT_SECRET, 
+//   process.env.REDIRECT_URI
+// )
+// oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN});
 
 const sendEmail = async (req, res) => {
   const {email, subject, html} = req.body;
   try {
-    const accessToken = await oAuth2Client.getAccessToken();
-
-    const transport = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        type: 'OAuth2',
-        user: process.env.G_MAIL,
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        refreshToken: process.env.REFRESH_TOKEN,
-        accessToken: accessToken,
-      },
-    });
+    // const accessToken = await oAuth2Client.getAccessToken();
 
     // const transport = nodemailer.createTransport({
-    //   host: 'smtp.privateemail.com',
-    //   port: 465,
-    //   secure: true,
+    //   service: 'gmail',
     //   auth: {
-    //     user: 'noreply@slim-bacolor.online',
-    //     pass: 'Slimnoreply102427'
-    //   }
+    //     type: 'OAuth2',
+    //     user: process.env.G_MAIL,
+    //     clientId: process.env.CLIENT_ID,
+    //     clientSecret: process.env.CLIENT_SECRET,
+    //     refreshToken: process.env.REFRESH_TOKEN,
+    //     accessToken: accessToken,
+    //   },
     // });
+
+    const transport = nodemailer.createTransport({
+      host: process.env.HOST,
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASS
+      }
+    });
 
     const mailOptions = {
       // from: `SLIM <noreply@slim-bacolor.online>`,
@@ -69,12 +69,12 @@ const forgotEmail = async (req, res) => {
     // });
 
     const transport = nodemailer.createTransport({
-      host: 'mail.privateemail.com',
-      port: 587,
-      secure: false,
+      host: process.env.HOST,
+      port: 465,
+      secure: true,
       auth: {
-        user: 'noreply@slim-bacolor.online',
-        pass: 'Slimnoreply102427'
+        user: process.env.EMAIL,
+        pass: process.env.PASS
       }
     });
 
