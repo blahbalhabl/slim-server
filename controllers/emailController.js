@@ -70,6 +70,11 @@ const forgotEmail = async (req, res) => {
     }
 
     const result = await transport.sendMail(mailOptions);
+
+    user.otpCode = undefined;
+    user.otpTimestamp = undefined;
+    await user.save();
+    
     return res.status(200).json(result);
   } catch (err) {
     return res.status(500).json({err, message: 'Internal Server Error'});
