@@ -425,6 +425,26 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+const verifyEmailOtp = async (req, res) => {
+  try {
+    const {email, otp} = req.body;
+    const user = await UserModel.findOne({email: email});
+
+    if(!user || otp !== user?.otpCode) {
+      return res.status(400).json({message: 'Unauthorized.'});
+    };
+
+    user.otpCode = undefined;
+    user.otpTimestamp = undefined;
+    await user.save();
+
+    res.status(200).json({message: 'OTP correct.'});
+
+  } catch(err) {
+    res.status(500).json({message: 'Internal Server Error.'});
+  }
+};
+
 const delUser = async (req, res) => {
   try {
     const role = req.role;
@@ -454,6 +474,7 @@ module.exports = {
   verifyOTP,
   updateUser,
   useOtp,
+  verifyEmailOtp,
   refreshAccessToken,
   logoutUser,
   changePassword,
