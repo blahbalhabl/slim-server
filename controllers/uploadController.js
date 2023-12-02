@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const speakeasy = require("speakeasy");
 const Ordinance = require('../models/ordinancesModel');
 const Barangay = require('../models/brgyOrdModel');
+const User = require('../models/userModel');
 
 const draftOrdinance = async (req, res) => {
   try {
@@ -200,6 +202,32 @@ const delOrdinance = async (req, res) => {
     }
 
     return res.status(200).json({message: 'File and database entry deleted successfully'})
+  } catch (err) {
+    res.status(500).json({err, message: 'Internal Server Error!'});
+  }
+};
+
+const confirmUpdateOrdinance = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const mayor = await User.findOne({position: 'Mayor'});
+
+    if(!mayor) {
+      return res.status(400).json({message: 'No Mayor Found!'});
+    };
+
+    const isValid = speakeasy.totp.verify({
+      secret: mayor.secret,
+      encoding: "base32",
+      token: otp,
+    });
+
+    if(!isValid) {
+      return res.status(400).json({message: 'Invalid OTP'});
+    }
+
+    res.status(200).json({message: 'OTP Validated!'});
+
   } catch (err) {
     res.status(500).json({err, message: 'Internal Server Error!'});
   }
@@ -412,4 +440,5 @@ module.exports = {
   searchOrdinance,
   getProceedings,
   getProceeding,
+  confirmUpdateOrdinance,
 }

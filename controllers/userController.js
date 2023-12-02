@@ -53,9 +53,12 @@ const refreshAccessToken = async (req, res) => {
     return res.status(200).json({
       id: user.id,
       avatar: user.avatar,
-      name: user.username, 
+      username: user.username,
+      email: user.email,
       role: user.role,
       level: user.level,
+      isMember: user.isMember,
+      position: user?.position,
       otp: user.is2faOn,
       token: newAccessToken });
   } catch (err) {
@@ -77,7 +80,15 @@ const generateDefaultPassword = (email) => {
 const createUser = async (req, res) => {
   try {
     const avatar = null;
-    const { email, username, role, level } = req.body;
+    const { 
+      email, 
+      username, 
+      role, 
+      level, 
+      isMember, 
+      position, 
+      startTerm, 
+      endTerm } = req.body;
 
     // Check if Email Already Exists
     const isExisting = await UserModel.findOne({ email });
@@ -105,6 +116,10 @@ const createUser = async (req, res) => {
       password: hash,
       role,
       level,
+      isMember,
+      position,
+      startTerm,
+      endTerm,
       secret: base32Secret,
     });
 
@@ -169,11 +184,14 @@ const loginUser = async (req, res) => {
       });
 
       return res.status(200).json({
-        id: user._id,
+        id: user.id,
         avatar: user.avatar,
-        name: user.username,
+        username: user.username,
+        email: user.email,
         role: user.role,
         level: user.level,
+        isMember: user.isMember,
+        position: user?.position,
         otp: user.is2faOn,
         token: accessToken,
       });
@@ -216,11 +234,15 @@ const verifyOTP = async (req, res) => {
       });
 
       return res.status(200).json({
-        id: user._id,
+        id: user.id,
         avatar: user.avatar,
-        name: user.username,
+        username: user.username,
+        email: user.email,
         role: user.role,
         level: user.level,
+        isMember: user.isMember,
+        position: user?.position,
+        otp: user.is2faOn,
         token: accessToken,
       });
     } else {
@@ -234,7 +256,6 @@ const verifyOTP = async (req, res) => {
 const useOtp = async (req, res) => {
   try {
     const userId = req.id;
-    const { is2faOn } = req.body;
 
     const user = await UserModel.findById(userId);
 
@@ -242,12 +263,68 @@ const useOtp = async (req, res) => {
       res.status(400).json({message: 'User does not exist!'});
     }
 
-    user.is2faOn = is2faOn;
+    user.is2faOn = true;
     await user.save();
 
-    res.status(200).json({user: user, message: '2FA Updated!'});
+    res.status(200).json({user: user, message: 'Two-Factor Authentication Updated.'});
   } catch (err) {
     res.status(500).json({err, message: 'Internal Server Error'});
+  }
+};
+
+const updateOtp = async (req, res) => {
+  try {
+    const { otp, secret } = req.body;
+    const userId = req.id;
+
+    const user = await UserModel.findById(userId);
+
+    if(!user) {
+      res.status(400).json({message: 'User does not exist!'});
+    }
+
+    const newSecret = speakeasy.totp.verify({
+      secret: secret,
+      encoding: "base32",
+      token: otp,
+    });
+
+    if(!newSecret) {
+      return res.status(400).json({message: 'Incorrect Authentication Code'});
+    }
+    user.secret = secret;
+    user.is2faOn = true;
+    await user.save();
+
+    res.status(200).json({message: 'Two-Factor Authentication Updated.'});
+  } catch (err) {
+    res.status(500).json({err, message: 'Internal Server Error'});
+  }
+};
+
+const disableOtp = async (req, res) => {
+  try {
+    const userId = req.id;
+    const { otp } = req.body;
+
+    const user = await UserModel.findById(userId);
+
+    const isValid = speakeasy.totp.verify({
+      secret: user.secret,
+      encoding: "base32",
+      token: otp,
+    });
+
+    if(!isValid) {
+      return res.status(400).json({message: 'Incorrect Authentication Code'});
+    }
+
+    user.is2faOn = false;
+    await user.save();
+
+    res.status(200).json({message: 'Two-Factor Authentication Disabled.'});
+  } catch (err) {
+    res.status(500).json({message: 'Internal Server Error.'})
   }
 }
 
@@ -368,7 +445,7 @@ const checkUser = async (req, res) => {
 
     // Save the OTP, user email, and timestamp in the database
     user.otpCode = otpCode;
-    user.otpTimestamp = Date.now();
+    user.otpTimestamp = Date.now() + 300000;
     await user.save();
 
     return res.status(200).json({ message: "User Found!" });
@@ -429,8 +506,9 @@ const verifyEmailOtp = async (req, res) => {
   try {
     const {email, otp} = req.body;
     const user = await UserModel.findOne({email: email});
+    const date = new Date();
 
-    if(!user || otp !== user?.otpCode) {
+    if((date <= user?.otpTimestamp) && (!user || otp !== user?.otpCode)) {
       return res.status(400).json({message: 'Unauthorized.'});
     };
 
@@ -440,6 +518,46 @@ const verifyEmailOtp = async (req, res) => {
 
     res.status(200).json({message: 'OTP correct.'});
 
+  } catch(err) {
+    res.status(500).json({message: 'Internal Server Error.'});
+  }
+};
+
+const new2FASecret = async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    // Generate a secret key
+    const secret = speakeasy.generateSecret({ length: 20 });
+
+    // Store the base32 secret in the database
+    const base32Secret = secret.base32;
+
+    // Generate the OTP authentication URL using the stored base32 secret
+    const label = email;
+    const issuer = 'SLIM';
+  
+    const otpAuthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(label)}?secret=${base32Secret}&issuer=${encodeURIComponent(issuer)}`;
+
+    const qrCodeUrl = await new Promise((resolve, reject) => {
+      qrcode.toDataURL(otpAuthUrl, (err, url) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(url);
+        }
+      });
+    });
+
+    res.status(200).json({ qrCode: qrCodeUrl, secret: base32Secret });
+  } catch(err) {
+    res.status(500).json({message: 'Internal Server Error.'});
+  }
+};
+
+const update2FA = async (req, res) => {
+  try {
+    
   } catch(err) {
     res.status(500).json({message: 'Internal Server Error.'});
   }
@@ -474,6 +592,7 @@ module.exports = {
   verifyOTP,
   updateUser,
   useOtp,
+  updateOtp,
   verifyEmailOtp,
   refreshAccessToken,
   logoutUser,
@@ -482,4 +601,7 @@ module.exports = {
   checkUser,
   checkPass,
   delUser,
+  disableOtp,
+  new2FASecret,
+  update2FA,
 };
