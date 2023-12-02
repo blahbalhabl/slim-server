@@ -16,6 +16,7 @@ const {
    getProceeding,
    viewOrdinance,
    getOrdinance,
+   confirmUpdateOrdinance,
 } = require('../controllers/uploadController');
 const { uploadLogo } = require('../controllers/avatarController');
 
@@ -38,6 +39,7 @@ router.post('/update-proceedings/:filename', updateProceedings);
 router.post('/upload/ordinance/draft', file.single('file'), auditTrail, draftOrdinance);
 router.post('/update-ordinance/:fileName', file.single('file'), auditTrail, updateOrdinance);
 router.post('/upload-logo', image.single('file'), auditTrail, uploadLogo);
+router.post('/confirm-update', confirmUpdateOrdinance);
 router.delete('/delete-ordinance/:fileName', auditTrail, delOrdinance);
 
 module.exports = router;

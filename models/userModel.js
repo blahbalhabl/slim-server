@@ -40,6 +40,19 @@ const userSchema = new mongoose.Schema({
     requred: true,
     default: false,
   },
+  position: {
+    type: String,
+    required: false,
+    default: undefined,
+  },
+  startTerm: {
+    type: Date,
+    required: false,
+  },
+  endTerm: {
+    type: Date,
+    required: false,
+  },
   is2faOn: {
     type: Boolean,
     required: true,
