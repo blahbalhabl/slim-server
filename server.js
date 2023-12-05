@@ -19,7 +19,7 @@ const proceeding = require('./routes/proceedingRoutes');
 const app = express();
 const PORT = process.env.PORT || 3500;
 
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ origin: process.env.ORIGIN, credentials: true }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.json());
