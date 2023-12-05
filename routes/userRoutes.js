@@ -9,7 +9,6 @@ const {
   refreshAccessToken,
   logoutUser,
   changePassword,
-  forgotPassword,
   useOtp,
   updateUser,
   checkUser,
