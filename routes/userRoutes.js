@@ -17,6 +17,8 @@ const {
   disableOtp,
   new2FASecret,
   updateOtp,
+  checkInitialUser,
+  createInitialUser,
 } = require("../controllers/userController");
 const { 
   avatarUpload, 
@@ -24,10 +26,12 @@ const {
   delAvatar,
 } = require('../controllers/avatarController');
 const { verify } = require("../middlewares/verifyToken");
-const { image } = require('../middlewares/configureMulter')
+const { image } = require('../middlewares/configureMulter');
 const router = Router();
 
 // General Routes
+router.get('/initial-user', checkInitialUser);
+router.post('/create-initial-user', createInitialUser);
 router.post('/forgot-password/:email', checkUser);
 router.post("/login", loginUser);
 router.post("/verify", verifyOTP);
