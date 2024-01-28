@@ -77,6 +77,19 @@ const generateDefaultPassword = (email) => {
   return `${emailPrefix}${randomDigits}`;
 };
 
+const checkInitialUser = async (req, res) => {
+  try {
+    const intitial = await UserModel.findOne({ role: 'Superadmin', level: 'LGU' });
+    if (!intitial) {
+      return res.status(200).json({message: 'No Initial User Found.'});
+    } else {
+      return;
+    }
+  } catch (err) {
+    res.status(500).json({err, message: 'Internal Server Error'});
+  }
+};
+
 const createUser = async (req, res) => {
   try {
     const avatar = null;
@@ -433,6 +446,71 @@ const changePassword = async (req, res) => {
   }
 };
 
+const confirmNewUserEmail = async (req, res) => {
+  try {
+    const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
+    res.status(200).json({ otpCode });
+  } catch (err) {
+    res.status(500).json({err, message: 'Internal Server Error'});
+  }
+};
+
+const createInitialUser = async (req, res) => {
+  try {
+    const avatar = null;
+    const { email } = req.body;
+
+    // Check if Email Already Exists
+    const isExisting = await UserModel.findOne({ email });
+
+    if (isExisting) {
+      return res.status(400).json("User Already Exists!");
+    }
+
+    // Generate a secret key
+    const secret = speakeasy.generateSecret({ length: 20 });
+
+    // Store the base32 secret in the database
+    const base32Secret = secret.base32;
+
+    // Generate Default Password
+    const defaultPassword = generateDefaultPassword(email);
+
+    // Hash Password with Bcrypt
+    const hash = await bcrypt.hash(defaultPassword, 10);
+    // If No Existing Email is found, continue with signup
+    const user = await UserModel.create({
+      avatar,
+      email,
+      username: 'Superadmin',
+      password: hash,
+      role: 'Superadmin',
+      level: 'LGU',
+      secret: base32Secret,
+    });
+
+    // Generate the OTP authentication URL using the stored base32 secret
+      const label = email;
+      const issuer = 'SLIM';
+  
+    const otpAuthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(label)}?secret=${base32Secret}&issuer=${encodeURIComponent(issuer)}`;
+
+    const qrCodeUrl = await new Promise((resolve, reject) => {
+      qrcode.toDataURL(otpAuthUrl, (err, url) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(url);
+        }
+      });
+    });
+
+    res.status(200).json({ user, defaultPassword, qrCode: qrCodeUrl, secret: base32Secret });
+  } catch (err) {
+    res.status(500).json({err, message: 'Something went wrong!'});
+  }
+};
+
 const checkUser = async (req, res) => {
   try {
     const user = await UserModel.findOne({ email: req.params.email });
@@ -506,7 +584,7 @@ const verifyEmailOtp = async (req, res) => {
   try {
     const {email, otp} = req.body;
     const user = await UserModel.findOne({email: email});
-    const date = new Date();
+    const date = new Date.now();
 
     if((date <= user?.otpTimestamp) && (!user || otp !== user?.otpCode)) {
       return res.status(400).json({message: 'Unauthorized.'});
@@ -604,4 +682,7 @@ module.exports = {
   disableOtp,
   new2FASecret,
   update2FA,
+  checkInitialUser,
+  createInitialUser,
+  confirmNewUserEmail,
 };
